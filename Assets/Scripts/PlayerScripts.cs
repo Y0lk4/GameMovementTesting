@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 6.0f;
     public float jumpForce = 20.0f;
+    public  float dashForce = 50.0f;
     public float wallrunSpeed = 6.0f;
 
     [Header("Ground Check")]
@@ -26,7 +28,7 @@ public class PlayerController : MonoBehaviour
 
     public bool wallrunning;
     private bool isGrounded;
-    private bool jumpRequested;
+    public bool jumpRequested;
 
     void Start()
     {
@@ -42,9 +44,17 @@ public class PlayerController : MonoBehaviour
 
         // Ground Check using a Raycast downwards
         isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundMask);
+        if (isGrounded && !wallrunning)
+            state = MovementState.Grounded;
+        else if (!isGrounded && !wallrunning)
+            state = MovementState.Airborne;
 
         StateHandler();
 
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            rb.AddForce(dashForce*transform.forward,ForceMode.VelocityChange);
+        }
         // Capture jump input in Update so frames aren't missed
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -59,29 +69,17 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        // Move relative to facing direction, flattened to the ground
-        Vector3 forward = transform.forward;
-        forward.y = 0f;
-        forward.Normalize();
-
-        Vector3 right = transform.right;
-        right.y = 0f;
-        right.Normalize();
-
-        Vector3 targetVelocity = (forward * v + right * h) * moveSpeed;
-
-        // Apply Jump or keep current vertical velocity
-        if (jumpRequested)
-        {
-            targetVelocity.y = jumpForce;
-            jumpRequested = false;
+        Vector3 targetVelocity =   ( transform.forward * v + transform.right * h).normalized * moveSpeed;
+        rb.linearVelocity = new Vector3(targetVelocity.x,rb.linearVelocity.y,targetVelocity.z);
+       
+       if (jumpRequested)
+       {
+            rb.AddForce(jumpForce*Vector3.up,ForceMode.VelocityChange);
+            jumpRequested = false;    
         }
-        else
-        {
-            targetVelocity.y = rb.linearVelocity.y; // keep gravity untouched
-        }
-
-        rb.linearVelocity = targetVelocity;
+        
+        
+        
     }
 
     private void StateHandler()

@@ -2675,7 +2675,7 @@ Transform:
   m_GameObject: {fileID: 388604776}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.62, y: 1.67, z: -38.18}
+  m_LocalPosition: {x: -1.62, y: 1.67, z: -38.212}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2725,9 +2725,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 1.5460391
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: -0.27301955, z: 0}
 --- !u!54 &388604780
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2768,7 +2768,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 10
-  jumpForce: 13
+  jumpForce: 20
   wallrunSpeed: 6
   groundMask:
     serializedVersion: 2
@@ -4639,8 +4639,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 795900306}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.9058912, y: 0, z: -15.89}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.9058912, y: 0, z: -15.8899975}
   m_LocalScale: {x: 2.245, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5407,7 +5407,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.24940057, y: -0, z: -0, w: 0.9684005}
-  m_LocalPosition: {x: 0, y: 3.81, z: -6.05}
+  m_LocalPosition: {x: 0, y: 3.81, z: -6.0179977}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8569,7 +8569,7 @@ Transform:
   m_GameObject: {fileID: 1804474388}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.030002594}
+  m_LocalPosition: {x: 0, y: 0, z: 0.0019989014}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9535,8 +9535,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 705507995}
   - {fileID: 388604777}
-  - {fileID: 795900310}
   - {fileID: 1134927631}
+  - {fileID: 795900310}
   - {fileID: 947396636}
   - {fileID: 1836562966}
   - {fileID: 1763367649}

@@ -31,12 +31,14 @@ public class WallRunning : MonoBehaviour
     public Transform orientation;
     private PlayerController pm;
     private Rigidbody rb;
+    private Camera cam;
 
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         pm = GetComponent<PlayerController>();
+        cam = Camera.main;
     }
 
     // Update is called once per frame
@@ -111,6 +113,7 @@ public class WallRunning : MonoBehaviour
         }
 
         //TBA, lock the camera to the direction im wall running to
+        orientation.rotation = Quaternion.LookRotation(wallForward, transform.up);
 
         rb.AddForce(wallForward * wallRunForce, ForceMode.Force);
     }

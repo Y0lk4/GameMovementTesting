@@ -9,13 +9,13 @@ public class CameraScript : MonoBehaviour
     
 
     private float verticalLook = 25f;
-    private Vector3 lookInput;
+    private Vector2 lookInput;
 
     // Called automatically by PlayerInput component via "Send Messages"
     // OR bound programmatically via C# Input Actions
     public void OnLook(InputValue value)
     {
-        lookInput = value.Get<Vector3>();
+        lookInput = value.Get<Vector2>();
     }
 
     public void OnCancel(InputValue value)
