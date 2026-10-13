@@ -56,10 +56,6 @@ public class PlayerController : MonoBehaviour
         Airborne
     }
 
-
- 
-
-
     void Start()
     {
         moveSpeed = defaultMoveSpeed;
@@ -76,37 +72,31 @@ public class PlayerController : MonoBehaviour
 
         //* Ground Check using a Raycast downwards
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
+
+        //* Grounded or Airborne section and not wallrunning + drag
+        if (isGrounded && !wallrunning)
+        {
+            rb.linearDamping = groundDrag;
+            envState = EnvironmentState.Grounded;        
+        } 
+        else if (!isGrounded && !wallrunning)
+        {
+            rb.linearDamping = 0f;  
+            envState = EnvironmentState.Airborne;
+        }
         
-        //* Drag section
-        if(isGrounded) rb.linearDamping = groundDrag;
-        else rb.linearDamping = 0f;    
-        
-        //* Grounded or Airborne section    
-        if (isGrounded && !wallrunning) envState = EnvironmentState.Grounded;        
-        else if (!isGrounded && !wallrunning) envState = EnvironmentState.Airborne;
             
 
         Inputs();
-       
-
         StateHandler();
 
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            Sprint();
-        }
-        else
-        {
-            moveSpeed = defaultMoveSpeed;
-            moveState = MovementState.Walking;
-        }
+
         // Capture jump input in Update so frames aren't missed
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             jumpRequested = true;
         }
 
-        LimitSpeed();
     }
 
     void FixedUpdate()
@@ -123,8 +113,28 @@ public class PlayerController : MonoBehaviour
         }
         
         
-        
+        LimitSpeed();
     }
+
+    private void StateHandler()
+    {
+        if (wallrunning)
+        {
+            moveState = MovementState.WallRunning;
+            moveSpeed = wallrunSpeed;
+        }
+        
+        else if (Input.GetKey(KeyCode.LeftShift))
+        {
+            Sprint();
+        }
+        else
+        {
+            moveSpeed = defaultMoveSpeed;
+            moveState = MovementState.Walking;
+        }
+    }
+
 
     private void Inputs()
     {
@@ -146,7 +156,7 @@ public class PlayerController : MonoBehaviour
     {
         moveSpeed = sprintSpeed;
         moveState = MovementState.Sprinting;
-        LimitSpeed();
+
     }
 
     //in case the walk speed goes faster than intended
@@ -161,12 +171,4 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void StateHandler()
-    {
-        if (wallrunning)
-        {
-            moveState = MovementState.WallRunning;
-            moveSpeed = wallrunSpeed;
-        }
-    }
 }
