@@ -26,30 +26,39 @@ public class PlayerController : MonoBehaviour
     public float playerHeight;
     public LayerMask groundMask;
     public float groundCheckDistance = 0.2f;
+
+
+    [Header("Movement Bool")]
     private bool isGrounded;
+    private bool isSliding;
+    private bool isSprinting;
+    public bool wallrunning;
+    public bool jumpRequested;
 
     Rigidbody rb;
     public float mouseSensitivity = 2.0f;
 
 
-    public MovementState state;
+    public MovementState moveState;
     public enum MovementState
     {
         WallRunning,
         Walking,
-        Sprinting
+        Sprinting,
+        Sliding,
+        Climbing
     }
 
-    public EnvironmentState eState;
+    public EnvironmentState envState;
     public enum EnvironmentState
     {
         Grounded,
         Airborne
     }
 
-    public bool wallrunning;
+
  
-    public bool jumpRequested;
+
 
     void Start()
     {
@@ -65,22 +74,17 @@ public class PlayerController : MonoBehaviour
         // Yaw: turn the whole player left/right
         transform.Rotate(0f, mouseX, 0f, Space.World);
 
-        // Ground Check using a Raycast downwards
+        //* Ground Check using a Raycast downwards
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
         
-        if(isGrounded)
-        {
-            rb.linearDamping = groundDrag;
-        }
-        else
-        {
-            rb.linearDamping = 0f;    
-        }
+        //* Drag section
+        if(isGrounded) rb.linearDamping = groundDrag;
+        else rb.linearDamping = 0f;    
         
-        if (isGrounded && !wallrunning)
-            eState = EnvironmentState.Grounded;
-        else if (!isGrounded && !wallrunning)
-            eState = EnvironmentState.Airborne;
+        //* Grounded or Airborne section    
+        if (isGrounded && !wallrunning) envState = EnvironmentState.Grounded;        
+        else if (!isGrounded && !wallrunning) envState = EnvironmentState.Airborne;
+            
 
         Inputs();
        
@@ -89,14 +93,12 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftShift))
         {
-            moveSpeed = sprintSpeed;
-            state = MovementState.Sprinting;
-            LimitSpeed();
+            Sprint();
         }
         else
         {
             moveSpeed = defaultMoveSpeed;
-            state = MovementState.Walking;
+            moveState = MovementState.Walking;
         }
         // Capture jump input in Update so frames aren't missed
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -140,6 +142,12 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void Sprint()
+    {
+        moveSpeed = sprintSpeed;
+        moveState = MovementState.Sprinting;
+        LimitSpeed();
+    }
 
     //in case the walk speed goes faster than intended
     private void LimitSpeed()
@@ -157,7 +165,7 @@ public class PlayerController : MonoBehaviour
     {
         if (wallrunning)
         {
-            state = MovementState.WallRunning;
+            moveState = MovementState.WallRunning;
             moveSpeed = wallrunSpeed;
         }
     }

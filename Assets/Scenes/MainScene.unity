@@ -2703,9 +2703,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1.5460391
+  m_Height: 2
   m_Direction: 1
-  m_Center: {x: 0, y: -0.27301955, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &388604780
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2746,7 +2746,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   defaultMoveSpeed: 10
-  jumpForce: 7
+  jumpForce: 6
   dashForce: 50
   wallrunSpeed: 6
   orientation: {fileID: 1507472399}
@@ -2756,11 +2756,11 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   groundCheckDistance: 0.2
-  mouseSensitivity: 2
-  state: 0
-  eState: 0
   wallrunning: 0
   jumpRequested: 0
+  mouseSensitivity: 2
+  moveState: 0
+  envState: 0
 --- !u!114 &388604782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2775,7 +2775,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WallRunning
   whatIsWall:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 64
   whatIsGround:
     serializedVersion: 2
     m_Bits: 128
@@ -6901,7 +6901,7 @@ GameObject:
   - component: {fileID: 1419948542}
   - component: {fileID: 1419948541}
   - component: {fileID: 1419948540}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
