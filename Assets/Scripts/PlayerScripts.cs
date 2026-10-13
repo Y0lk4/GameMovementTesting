@@ -1,18 +1,32 @@
 using NUnit.Framework;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.InputSystem.DualShock.LowLevel;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 6.0f;
-    public float jumpForce = 20.0f;
+    public float defaultMoveSpeed = 10.0f;
+    private float moveSpeed;
+    private float sprintSpeed;
+    public float jumpForce = 7.0f;
     public  float dashForce = 50.0f;
-    public float wallrunSpeed = 6.0f;
+    public float wallrunSpeed = 8.0f;
+    public Transform orientation;
+    public float groundDrag;
+    float horizontalInput;
+    float verticalInput;
+    
+    Vector3 moveDirection;
+    
 
     [Header("Ground Check")]
+    public float playerHeight;
     public LayerMask groundMask;
     public float groundCheckDistance = 0.2f;
+    private bool isGrounded;
 
     Rigidbody rb;
     public float mouseSensitivity = 2.0f;
@@ -21,17 +35,26 @@ public class PlayerController : MonoBehaviour
     public MovementState state;
     public enum MovementState
     {
-        Grounded,
         WallRunning,
+        Walking,
+        Sprinting
+    }
+
+    public EnvironmentState eState;
+    public enum EnvironmentState
+    {
+        Grounded,
         Airborne
     }
 
     public bool wallrunning;
-    private bool isGrounded;
+ 
     public bool jumpRequested;
 
     void Start()
     {
+        moveSpeed = defaultMoveSpeed;
+        sprintSpeed = moveSpeed * 1.5f;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // don't let collisions tip the player over
     }
@@ -43,34 +66,53 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(0f, mouseX, 0f, Space.World);
 
         // Ground Check using a Raycast downwards
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundMask);
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
+        
+        if(isGrounded)
+        {
+            rb.linearDamping = groundDrag;
+        }
+        else
+        {
+            rb.linearDamping = 0f;    
+        }
+        
         if (isGrounded && !wallrunning)
-            state = MovementState.Grounded;
+            eState = EnvironmentState.Grounded;
         else if (!isGrounded && !wallrunning)
-            state = MovementState.Airborne;
+            eState = EnvironmentState.Airborne;
+
+        Inputs();
+       
 
         StateHandler();
 
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            rb.AddForce(dashForce*transform.forward,ForceMode.VelocityChange);
+            moveSpeed = sprintSpeed;
+            state = MovementState.Sprinting;
+            LimitSpeed();
+        }
+        else
+        {
+            moveSpeed = defaultMoveSpeed;
+            state = MovementState.Walking;
         }
         // Capture jump input in Update so frames aren't missed
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             jumpRequested = true;
         }
+
+        LimitSpeed();
     }
 
     void FixedUpdate()
     {
+        MovePlayer();
+
         if (wallrunning) return;
 
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-
-        Vector3 targetVelocity =   ( transform.forward * v + transform.right * h).normalized * moveSpeed;
-        rb.linearVelocity = new Vector3(targetVelocity.x,rb.linearVelocity.y,targetVelocity.z);
        
        if (jumpRequested)
        {
@@ -80,6 +122,35 @@ public class PlayerController : MonoBehaviour
         
         
         
+    }
+
+    private void Inputs()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
+        
+    }
+
+    private void MovePlayer()
+    {
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+        rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+
+
+    }
+
+
+    //in case the walk speed goes faster than intended
+    private void LimitSpeed()
+    {
+        Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
+        if(flatVelocity.magnitude > moveSpeed)
+        {
+            Vector3 limitVelocity = flatVelocity.normalized * moveSpeed;
+            rb.linearVelocity = new Vector3(limitVelocity.x, rb.linearVelocity.y, limitVelocity.z);
+        }
     }
 
     private void StateHandler()
