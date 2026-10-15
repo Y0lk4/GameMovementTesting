@@ -1,3 +1,4 @@
+
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Unity.VisualScripting;
@@ -15,14 +16,16 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 7.0f;
     public  float dashForce = 50.0f;
     public float wallrunSpeed = 8.0f;
-    private float slidingDecel = 15f;
+    
     public Transform orientation;
     public float groundDrag;
     float horizontalInput;
     float verticalInput;
-    
     Vector3 moveDirection;
-    
+
+    [Header("Sliding")]
+    private float slidingDecel = 15f;
+    public float slideForce = 20.0f;
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -166,7 +169,7 @@ public class PlayerController : MonoBehaviour
         {
             moveSpeed = defaultMoveSpeed;
             moveState = MovementState.Walking;
-
+            defaultBoolean();
         }
     }
 
@@ -195,7 +198,10 @@ public class PlayerController : MonoBehaviour
     private void Slide()
     {
         moveState = MovementState.Sliding;
+        Vector3 reverseVelo = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+
         isSprinting = false;
+
     }
 
     //in case the walk speed goes faster than intended
