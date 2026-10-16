@@ -1,3 +1,3 @@
 # Game Movement Testing
-Started out as a in class lab, working on it whenever I feel like it
+Small project of mine showcasing different movement styles from 3d to 2d, from parkour to platformers and more.
 
