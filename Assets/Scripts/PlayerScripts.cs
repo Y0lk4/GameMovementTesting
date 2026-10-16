@@ -134,8 +134,7 @@ public class PlayerController : MonoBehaviour
             isSprinting = false; // to make sure i am not sprinting during the sprint even thought its impossible
                                 // its just to make sure sprint boolean is false after a slide
             transform.localScale = new Vector3(transform.localScale.x, 0.7f, transform.localScale.z);
-            
-            StartCrouching();
+
             MovePlayer();
         }
         else    
@@ -166,6 +165,10 @@ public class PlayerController : MonoBehaviour
         else if (Input.GetKey(KeyCode.LeftControl))
         {
                 Crouching(); 
+        }
+        else if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            StartCrouching();
         }
         else if (Input.GetKeyUp(KeyCode.LeftControl))
         {

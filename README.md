@@ -9,4 +9,4 @@ Small project of mine showcasing different movement styles from 3d to 2d, from p
 - enable/disable movement features
 - gravity affecting slides during slopes
 - dash
-- 
+- web swinging

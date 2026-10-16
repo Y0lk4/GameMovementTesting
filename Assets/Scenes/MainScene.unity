@@ -2698,7 +2698,7 @@ MonoBehaviour:
   whatIsGround:
     serializedVersion: 2
     m_Bits: 128
-  wallRunForce: 200
+  wallRunForce: 20
   wallJumpForce: 7
   wallJumpSideForce: 12
   maxWallRunTime: 1.5
