@@ -55,8 +55,6 @@ public class SlidingScript : MonoBehaviour
     private void StartSlide()
     {
         pc.isSliding = true;
-        playerObj.localScale = new Vector3(playerObj.localScale.x, 0.5f, playerObj.localScale.z);
-
         //to make sure when the player gets scaled down, the player does not float a bit
         rb.AddForce(Vector3.down * 10f, ForceMode.Impulse); 
 
