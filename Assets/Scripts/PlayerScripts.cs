@@ -15,9 +15,11 @@ public class PlayerController : MonoBehaviour
     public float defaultMoveSpeed = 10.0f;
     private float moveSpeed;
     private float sprintSpeed;
+    private float crouchSpeed;
     public float jumpForce = 7.0f;
     public  float dashForce = 50.0f;
     public float wallrunSpeed = 8.0f;
+    
 
 
     public Transform orientation;
@@ -87,7 +89,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
 
         //* Grounded or Airborne section and not wallrunning + drag
-        if (isGrounded && !wallrunning)
+        if (isGrounded && !wallrunning && !isSliding)
         {
             rb.linearDamping = groundDrag;
             envState = EnvironmentState.Grounded;        
@@ -127,11 +129,15 @@ public class PlayerController : MonoBehaviour
         if(isSliding)
         {
             transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
-            // Slide();
+            // see sliding script for sliding logic
         }
         else if(isCrouching)
         {
+            isSprinting = false; // to make sure i am not sprinting during the sprint even thought its impossible
+                                // its just to make sure sprint boolean is false after a slide
             transform.localScale = new Vector3(transform.localScale.x, 0.7f, transform.localScale.z);
+            //make sure that the player model doesn't float in the air for a bit
+            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
             MovePlayer();
         }
         else    
