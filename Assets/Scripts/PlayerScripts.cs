@@ -1,9 +1,11 @@
 
+using System.Security.Cryptography;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.InputSystem.DualShock.LowLevel;
 using UnityEngine.Rendering.Universal;
 
@@ -16,16 +18,18 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 7.0f;
     public  float dashForce = 50.0f;
     public float wallrunSpeed = 8.0f;
-    
+
+
     public Transform orientation;
     public float groundDrag;
     float horizontalInput;
     float verticalInput;
     Vector3 moveDirection;
 
-    [Header("Sliding")]
-    private float slidingDecel = 15f;
-    public float slideForce = 20.0f;
+
+
+    
+
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -34,9 +38,9 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("Movement Bool")]
-    private bool isGrounded;
-    private bool isSliding;
-    private bool isSprinting;
+    public bool isGrounded;
+    public bool isSliding;
+    public bool isSprinting;
     public bool wallrunning;
     private bool jumpRequested;
     public bool isCrouching;
@@ -68,7 +72,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         moveSpeed = defaultMoveSpeed;
-        sprintSpeed = moveSpeed * 4f;
+        sprintSpeed = moveSpeed * 2f;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // don't let collisions tip the player over
     }
@@ -110,7 +114,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        MovePlayer();
+        
 
         if (wallrunning) return;
 
@@ -120,11 +124,20 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(jumpForce*Vector3.up,ForceMode.VelocityChange);
             jumpRequested = false;    
         }
-
-        if(isCrouching)
+        if(isSliding)
         {
             transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
-            isCrouching = false;
+            // Slide();
+        }
+        else if(isCrouching)
+        {
+            transform.localScale = new Vector3(transform.localScale.x, 0.7f, transform.localScale.z);
+            MovePlayer();
+        }
+        else    
+        {
+            transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
+            MovePlayer();
         }
         
         
@@ -138,31 +151,30 @@ public class PlayerController : MonoBehaviour
             moveState = MovementState.WallRunning;
             moveSpeed = wallrunSpeed;
         }
-        
+        else if (Input.GetKey(KeyCode.LeftControl) && isSprinting && !isSliding)
+        {
+            // StartSlide();
+        }
+        else if (Input.GetKey(KeyCode.LeftControl) && isSliding)
+        {
+            moveState = MovementState.Sliding;
+        }
         else if (Input.GetKey(KeyCode.LeftControl))
         {
-            if(isSprinting)
-            {
-                Slide();
-                isSliding = true;
-                //* TBA somewhere, when character either reaches 0 speed or stops holding crouch, sliding = false and no longer sprinting
-            }
-            else
-            {
                 moveState = MovementState.Crouching;
                 isCrouching = true;
                 isSliding = false;
-            }
         }
         else if (Input.GetKeyUp(KeyCode.LeftControl))
         {
             transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
+            isCrouching = false;
         }   
         else if (Input.GetKey(KeyCode.LeftShift))
         {
             if(!isCrouching)
             {
-                Sprint();    
+                Sprint();
             }
         }
         else
@@ -190,23 +202,20 @@ public class PlayerController : MonoBehaviour
 
     private void Sprint()
     {
+        isSprinting = true;
         moveSpeed = sprintSpeed;
         moveState = MovementState.Sprinting;
 
     }
 
-    private void Slide()
-    {
-        moveState = MovementState.Sliding;
-        Vector3 reverseVelo = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+    
 
-        isSprinting = false;
-
-    }
 
     //in case the walk speed goes faster than intended
     private void LimitSpeed()
     {
+        if(isSliding) return;
+
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
         if(flatVelocity.magnitude > moveSpeed)
