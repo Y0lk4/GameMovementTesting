@@ -134,9 +134,8 @@ public class PlayerController : MonoBehaviour
             isSprinting = false; // to make sure i am not sprinting during the sprint even thought its impossible
                                 // its just to make sure sprint boolean is false after a slide
             transform.localScale = new Vector3(transform.localScale.x, 0.7f, transform.localScale.z);
-            //make sure that the player model doesn't float in the air for a bit
             
-            
+            StartCrouching();
             MovePlayer();
         }
         else    
@@ -203,6 +202,8 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
     }
 
+    //make sure that the player model doesn't float in the air for a bit
+    // if in the air, it doesn't do anything
     private void StartCrouching()
     {
         if(isGrounded)
