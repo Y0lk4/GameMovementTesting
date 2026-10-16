@@ -75,6 +75,7 @@ public class PlayerController : MonoBehaviour
     {
         moveSpeed = defaultMoveSpeed;
         sprintSpeed = moveSpeed * 2f;
+        crouchSpeed = defaultMoveSpeed / 2f;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // don't let collisions tip the player over
     }
@@ -99,12 +100,9 @@ public class PlayerController : MonoBehaviour
             rb.linearDamping = 0f;  
             envState = EnvironmentState.Airborne;
         }
-        
-            
 
         Inputs();
         StateHandler();
-
 
         // Capture jump input in Update so frames aren't missed
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -137,7 +135,8 @@ public class PlayerController : MonoBehaviour
                                 // its just to make sure sprint boolean is false after a slide
             transform.localScale = new Vector3(transform.localScale.x, 0.7f, transform.localScale.z);
             //make sure that the player model doesn't float in the air for a bit
-            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+            
+            
             MovePlayer();
         }
         else    
@@ -167,9 +166,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.LeftControl))
         {
-                moveState = MovementState.Crouching;
-                isCrouching = true;
-                isSliding = false;
+                Crouching(); 
         }
         else if (Input.GetKeyUp(KeyCode.LeftControl))
         {
@@ -206,6 +203,21 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
     }
 
+    private void StartCrouching()
+    {
+        if(isGrounded)
+        {
+            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+        }
+    }
+
+    private void Crouching()
+    {
+        isCrouching = true;
+        moveSpeed = crouchSpeed;
+        moveState = MovementState.Crouching;
+    }
+
     private void Sprint()
     {
         isSprinting = true;
@@ -213,9 +225,6 @@ public class PlayerController : MonoBehaviour
         moveState = MovementState.Sprinting;
 
     }
-
-    
-
 
     //in case the walk speed goes faster than intended
     private void LimitSpeed()
