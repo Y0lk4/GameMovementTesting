@@ -17,8 +17,11 @@ public class PlayerController : MonoBehaviour
     private float sprintSpeed;
     private float crouchSpeed;
     public float jumpForce = 7.0f;
-    public  float dashForce = 50.0f;
+    public float dashForce = 50.0f;
     public float wallrunSpeed = 8.0f;
+    public float airJumpForce = 3.0f;
+    public int airJumps = 1;
+    public int airJumpCount = 0;
     
 
 
@@ -27,11 +30,6 @@ public class PlayerController : MonoBehaviour
     float horizontalInput;
     float verticalInput;
     Vector3 moveDirection;
-
-
-
-    
-
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -53,7 +51,10 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 2.0f;
 
 
+    [Header("States")]
     public MovementState moveState;
+    
+    public EnvironmentState envState;
     public enum MovementState
     {
         WallRunning,
@@ -64,7 +65,6 @@ public class PlayerController : MonoBehaviour
         Crouching
     }
 
-    public EnvironmentState envState;
     public enum EnvironmentState
     {
         Grounded,
@@ -92,6 +92,7 @@ public class PlayerController : MonoBehaviour
         //* Grounded or Airborne section and not wallrunning + drag
         if (isGrounded && !wallrunning && !isSliding)
         {
+            airJumpCount = 0;
             rb.linearDamping = groundDrag;
             envState = EnvironmentState.Grounded;        
         } 
@@ -105,7 +106,7 @@ public class PlayerController : MonoBehaviour
         StateHandler();
 
         // Capture jump input in Update so frames aren't missed
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump"))
         {
             jumpRequested = true;
         }
@@ -114,15 +115,17 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        
-
         if (wallrunning) return;
-
-       
+        
        if (jumpRequested)
        {
             rb.AddForce(jumpForce*Vector3.up,ForceMode.VelocityChange);
-            jumpRequested = false;    
+            jumpRequested = false;
+            if (!isGrounded && airJumpCount != airJumps){
+                rb.AddForce(airJumpForce*Vector3.up,ForceMode.VelocityChange);
+                jumpRequested = false;
+                airJumpCount++;
+            }
         }
         if(isSliding)
         {
