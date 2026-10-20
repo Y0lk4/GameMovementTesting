@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     public float airJumpForce = 3.0f;
     public int airJumps = 1;
     public int airJumpCount = 0;
-    
+
 
 
     public Transform orientation;
@@ -46,14 +46,14 @@ public class PlayerController : MonoBehaviour
     public bool isCrouching;
 
     Rigidbody rb;
-    [SerializeField]private GameObject playerObject;
+    [SerializeField] private GameObject playerObject;
 
     public float mouseSensitivity = 2.0f;
 
 
     [Header("States")]
     public MovementState moveState;
-    
+
     public EnvironmentState envState;
     public enum MovementState
     {
@@ -89,16 +89,16 @@ public class PlayerController : MonoBehaviour
         //* Ground Check using a Raycast downwards
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
 
-        //* Grounded or Airborne section and not wallrunning + drag
+        //* Grounded or Airborne section and not wall running + drag
         if (isGrounded && !wallrunning && !isSliding)
         {
             airJumpCount = 0;
             rb.linearDamping = groundDrag;
-            envState = EnvironmentState.Grounded;        
-        } 
+            envState = EnvironmentState.Grounded;
+        }
         else if (!isGrounded && !wallrunning)
         {
-            rb.linearDamping = 0f;  
+            rb.linearDamping = 0f;
             envState = EnvironmentState.Airborne;
         }
 
@@ -115,38 +115,42 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (wallrunning) return;
-        
-       if (jumpRequested)
-       {
-            rb.AddForce(jumpForce*Vector3.up,ForceMode.VelocityChange);
-            jumpRequested = false;
-            if (!isGrounded && airJumpCount != airJumps){
-                rb.AddForce(airJumpForce*Vector3.up,ForceMode.VelocityChange);
-                jumpRequested = false;
-                airJumpCount++;
-            }
+        if (wallrunning || isGrounded)
+        {
+            airJumpCount = 0;
         }
-        if(isSliding)
+        if (jumpRequested)
+        {
+            if (isGrounded)
+            {
+                Jump();
+            }
+            else if (!isGrounded && !wallrunning && airJumpCount != airJumps)
+            {
+                AirJump();
+            }
+
+        }
+        if (isSliding)
         {
             transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
             // see sliding script for sliding logic
         }
-        else if(isCrouching)
+        else if (isCrouching)
         {
             isSprinting = false; // to make sure i am not sprinting during the sprint even thought its impossible
-                                // its just to make sure sprint boolean is false after a slide
+                                 // its just to make sure sprint boolean is false after a slide
             transform.localScale = new Vector3(transform.localScale.x, 0.7f, transform.localScale.z);
 
             MovePlayer();
         }
-        else    
+        else
         {
             transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
             MovePlayer();
         }
-        
-        
+
+
         LimitSpeed();
     }
 
@@ -167,9 +171,9 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.LeftControl))
         {
-                Crouching(); 
+            Crouching();
         }
-        else if(Input.GetKeyDown(KeyCode.LeftControl))
+        else if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             StartCrouching();
         }
@@ -177,10 +181,10 @@ public class PlayerController : MonoBehaviour
         {
             transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
             isCrouching = false;
-        }   
+        }
         else if (Input.GetKey(KeyCode.LeftShift))
         {
-            if(!isCrouching)
+            if (!isCrouching)
             {
                 Sprint();
             }
@@ -198,7 +202,7 @@ public class PlayerController : MonoBehaviour
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
-        
+
     }
 
     private void MovePlayer()
@@ -208,11 +212,24 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
     }
 
+    private void Jump()
+    {
+        rb.AddForce(jumpForce * Vector3.up, ForceMode.VelocityChange);
+        jumpRequested = false;
+    }
+
+    private void AirJump()
+    {
+        rb.AddForce(airJumpForce * Vector3.up, ForceMode.VelocityChange);
+        jumpRequested = false;
+        airJumpCount++;
+    }
+
     //make sure that the player model doesn't float in the air for a bit
     // if in the air, it doesn't do anything
     private void StartCrouching()
     {
-        if(isGrounded)
+        if (isGrounded)
         {
             rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
         }
@@ -236,11 +253,11 @@ public class PlayerController : MonoBehaviour
     //in case the walk speed goes faster than intended
     private void LimitSpeed()
     {
-        if(isSliding) return;
+        if (isSliding) return;
 
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
-        if(flatVelocity.magnitude > moveSpeed)
+        if (flatVelocity.magnitude > moveSpeed)
         {
             Vector3 limitVelocity = flatVelocity.normalized * moveSpeed;
             rb.linearVelocity = new Vector3(limitVelocity.x, rb.linearVelocity.y, limitVelocity.z);

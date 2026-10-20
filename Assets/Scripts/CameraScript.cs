@@ -8,7 +8,8 @@ public class CameraScript : MonoBehaviour
     public float lookLimit = 80.0f;
     
 
-    private float verticalLook = 25f;
+    [SerializeField] private GameObject head;
+    private float verticalLook = 0f;
     private Vector2 lookInput;
 
     // Called automatically by PlayerInput component via "Send Messages"
@@ -31,15 +32,25 @@ public class CameraScript : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        verticalLook = transform.localEulerAngles.x;
+        if (verticalLook > 180f) verticalLook -= 360f;
     }
 
     void LateUpdate()
     {
-        //Calculate pitch (up/down) for the camera
-        float mouseY = lookInput.y * mouseSensitivity;
-        verticalLook -= mouseY;
+        if (Mouse.current != null)
+        {
+            Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+            
+            // Calculate pitch (up/down)
+            float mouseY = mouseDelta.y * mouseSensitivity;
+            verticalLook -= mouseY;
+        }
         verticalLook = Mathf.Clamp(verticalLook, -lookLimit, lookLimit);
 
-        transform.localRotation = Quaternion.Euler(verticalLook, 0f, 0f);
+        transform.localRotation = Quaternion.Euler(verticalLook, transform.localRotation.eulerAngles.y, 0f);
+
+        lookInput = Vector2.zero;
     }
 }

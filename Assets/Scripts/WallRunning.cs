@@ -133,5 +133,6 @@ public class WallRunning : MonoBehaviour
 
         // rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
         rb.AddForce(forceToApply, ForceMode.VelocityChange);
+        pm.airJumpCount = 0; //ensure that we can double jump after a wall jump
     }
 }
