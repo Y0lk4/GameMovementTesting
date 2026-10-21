@@ -1,5 +1,6 @@
 
 using System.Security.Cryptography;
+using NUnit;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using Unity.VisualScripting;
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour
     public bool wallrunning;
     private bool jumpRequested;
     public bool isCrouching;
+    public bool isBulletJumping;
 
     Rigidbody rb;
     [SerializeField] private GameObject playerObject;
@@ -62,7 +64,8 @@ public class PlayerController : MonoBehaviour
         Sprinting,
         Sliding,
         Climbing,
-        Crouching
+        Crouching,
+        BulletJumping
     }
 
     public enum EnvironmentState
@@ -182,7 +185,7 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
             isCrouching = false;
         }
-        else if (Input.GetKey(KeyCode.LeftShift))
+        else if (Input.GetKey(KeyCode.LeftShift) && isGrounded)
         {
             if (!isCrouching)
             {
@@ -207,6 +210,10 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
+        if(envState == EnvironmentState.Airborne)
+        {
+            return;
+        }
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
         rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
@@ -244,6 +251,12 @@ public class PlayerController : MonoBehaviour
 
     private void Sprint()
     {
+
+        if(envState == EnvironmentState.Airborne)
+        {
+            isSprinting = false;
+            return;
+        }
         isSprinting = true;
         moveSpeed = sprintSpeed;
         moveState = MovementState.Sprinting;

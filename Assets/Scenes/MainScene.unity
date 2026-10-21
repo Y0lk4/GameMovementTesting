@@ -2573,6 +2573,7 @@ GameObject:
   - component: {fileID: 388604782}
   - component: {fileID: 388604783}
   - component: {fileID: 388604784}
+  - component: {fileID: 388604785}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -2594,7 +2595,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1804474389}
-  - {fileID: 963194228}
   - {fileID: 1507472399}
   - {fileID: 741174927}
   m_Father: {fileID: 0}
@@ -2680,6 +2680,7 @@ MonoBehaviour:
   isSprinting: 0
   wallrunning: 0
   isCrouching: 0
+  isBulletJumping: 0
   playerObject: {fileID: 388604776}
   mouseSensitivity: 2
   moveState: 0
@@ -2739,6 +2740,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpeedMeter
   speedText: {fileID: 80219353}
+--- !u!114 &388604785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 388604776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b54f7feb969fd3d4b8cf1818946ea434, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BulletJumping
+  bulletJumpForce: 14
+  head: {fileID: 741174926}
 --- !u!1 &437241492
 GameObject:
   m_ObjectHideFlags: 0
@@ -3548,6 +3563,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 741174927}
+  - component: {fileID: 741174928}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -3567,9 +3583,25 @@ Transform:
   m_LocalPosition: {x: -0.021, y: 0.59, z: -0.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 963194228}
   m_Father: {fileID: 388604777}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &741174928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 741174926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11a82945dfc8d3948a6e6726b6777f93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraScript
+  mouseSensitivity: 0.1
+  lookLimit: 80
+  head: {fileID: 741174926}
 --- !u!1 &767379434
 GameObject:
   m_ObjectHideFlags: 0
@@ -4289,7 +4321,6 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
-  - component: {fileID: 963194229}
   - component: {fileID: 963194230}
   m_Layer: 3
   m_Name: Main Camera
@@ -4366,27 +4397,12 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.24940057, y: -0, z: -0, w: 0.9684005}
-  m_LocalPosition: {x: 0, y: 3.81, z: -6.0179977}
+  m_LocalPosition: {x: 0.021, y: 3.22, z: -6.0079975}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 388604777}
+  m_Father: {fileID: 741174927}
   m_LocalEulerAnglesHint: {x: 28.884, y: 0, z: 0}
---- !u!114 &963194229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11a82945dfc8d3948a6e6726b6777f93, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mouseSensitivity: 2
-  lookLimit: 80
-  head: {fileID: 0}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
