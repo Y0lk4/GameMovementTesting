@@ -1,4 +1,5 @@
 
+using System;
 using System.Security.Cryptography;
 using NUnit;
 using NUnit.Framework;
@@ -8,15 +9,16 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
 using UnityEngine.InputSystem.DualShock.LowLevel;
+using UnityEngine.InputSystem.XR.Haptics;
 using UnityEngine.Rendering.Universal;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float defaultMoveSpeed = 10.0f;
-    private float moveSpeed;
-    private float sprintSpeed;
-    private float crouchSpeed;
+    public float moveSpeed;
+    public float sprintSpeed;
+    public float crouchSpeed;
     public float jumpForce = 7.0f;
     public float dashForce = 50.0f;
     public float wallrunSpeed = 8.0f;
@@ -28,24 +30,15 @@ public class PlayerController : MonoBehaviour
 
     public Transform orientation;
     public float groundDrag;
-    float horizontalInput;
-    float verticalInput;
+    public float horizontalInput;
+    public float verticalInput;
     Vector3 moveDirection;
 
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask groundMask;
     public float groundCheckDistance = 0.2f;
-
-
-    [Header("Movement Bool")]
-    public bool isGrounded;
-    public bool isSliding;
-    public bool isSprinting;
-    public bool wallrunning;
-    private bool jumpRequested;
-    public bool isCrouching;
-    public bool isBulletJumping;
+    public bool isGrounded = true;
 
     Rigidbody rb;
     [SerializeField] private GameObject playerObject;
@@ -53,26 +46,19 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 2.0f;
 
 
+
     [Header("States")]
-    public MovementState moveState;
-
-    public EnvironmentState envState;
-    public enum MovementState
-    {
-        WallRunning,
-        Walking,
-        Sprinting,
-        Sliding,
-        Climbing,
-        Crouching,
-        BulletJumping
-    }
-
-    public enum EnvironmentState
-    {
-        Grounded,
-        Airborne
-    }
+    private PlayerState currentState;
+    public GroundedState GroundedState {get: private set;}
+    public AirborneState AirborneState {get; private set;}
+    public WalkState WalkState { get; private set;}
+    public SprintState SprintState { get; private set;}
+    public WallRunningState WallRunningState { get; private set;}
+    public SlideState SlideState { get; private set;}
+    public ClimbingState ClimbingState { get; private set;}
+    public CrouchingState CrouchingState { get; private set;}
+    public BulletJumpingState BulletJumpingState { get; private set;}
+    public JumpState JumpState {get; private set;}
 
     void Start()
     {
@@ -164,10 +150,6 @@ public class PlayerController : MonoBehaviour
             moveState = MovementState.WallRunning;
             moveSpeed = wallrunSpeed;
         }
-        else if (Input.GetKey(KeyCode.LeftControl) && isSprinting && !isSliding)
-        {
-            // StartSlide();
-        }
         else if (Input.GetKey(KeyCode.LeftControl) && isSliding)
         {
             moveState = MovementState.Sliding;
@@ -185,19 +167,18 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
             isCrouching = false;
         }
-        else if (Input.GetKey(KeyCode.LeftShift) && isGrounded)
-        {
-            if (!isCrouching)
-            {
-                Sprint();
-            }
-        }
         else
         {
             moveSpeed = defaultMoveSpeed;
             moveState = MovementState.Walking;
             defaultBoolean();
         }
+    }
+
+    public void SwitchState(PlayerState newState)
+    {
+        currentState = newState;
+        currentState.Enter();
     }
 
 
@@ -208,9 +189,9 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void MovePlayer()
+    public void MovePlayer()
     {
-        if(envState == EnvironmentState.Airborne)
+        if(currentState is AirborneState)
         {
             return;
         }
@@ -219,54 +200,29 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
     }
 
-    private void Jump()
+    public void Jump()
     {
         rb.AddForce(jumpForce * Vector3.up, ForceMode.VelocityChange);
-        jumpRequested = false;
     }
 
-    private void AirJump()
+    public void AirJump()
     {
         rb.AddForce(airJumpForce * Vector3.up, ForceMode.VelocityChange);
-        jumpRequested = false;
         airJumpCount++;
     }
 
     //make sure that the player model doesn't float in the air for a bit
     // if in the air, it doesn't do anything
-    private void StartCrouching()
+    public void StartCrouching()
     {
         if (isGrounded)
         {
             rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
         }
     }
-
-    private void Crouching()
-    {
-        isCrouching = true;
-        moveSpeed = crouchSpeed;
-        moveState = MovementState.Crouching;
-    }
-
-    private void Sprint()
-    {
-
-        if(envState == EnvironmentState.Airborne)
-        {
-            isSprinting = false;
-            return;
-        }
-        isSprinting = true;
-        moveSpeed = sprintSpeed;
-        moveState = MovementState.Sprinting;
-
-    }
-
     //in case the walk speed goes faster than intended
     private void LimitSpeed()
     {
-        if (isSliding) return;
 
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
@@ -277,11 +233,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void defaultBoolean()
-    {
-        isSprinting = false;
-        isSliding = false;
-        isCrouching = false;
-    }
+
 
 }
