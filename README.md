@@ -3,6 +3,9 @@ Small project of mine showcasing different movement styles from 3d to 2d, from p
 
 ## Gifs TBA when polished a bit more
 
+### VERY IMPORTANT TO DO
+- change to a state pattern architecture so that player controller doesn't get bigger and bigger
+
 ## To-Do
 - menu to pick between 2 or 3d
 - bullet jump
@@ -12,3 +15,4 @@ Small project of mine showcasing different movement styles from 3d to 2d, from p
 - gravity affecting slides during slopes
 - dash
 - web swinging
+-
