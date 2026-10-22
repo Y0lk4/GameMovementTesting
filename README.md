@@ -3,7 +3,7 @@ Small project of mine showcasing different movement styles from 3d to 2d, from p
 
 ## Gifs TBA when polished a bit more
 
-### VERY IMPORTANT TO DO
+## VERY IMPORTANT TO DO
 - change to a state pattern architecture so that player controller doesn't get bigger and bigger
 
 ## To-Do
