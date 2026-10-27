@@ -1,5 +1,6 @@
 using System;
 using Unity.VisualScripting;
+using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 
@@ -11,6 +12,7 @@ public class GroundedState : PlayerState
     public override void Enter()
     {   
         base.Enter();
+        player.moveSpeed = player.defaultMoveSpeed;
         player.isGrounded = true;
         jumpTriggered = false;
     }
@@ -35,6 +37,7 @@ public class GroundedState : PlayerState
             jumpTriggered = false;
             player.SwitchState(player.AirborneState);
         }
+        
         player.MovePlayer();
         player.LimitSpeed();
     }

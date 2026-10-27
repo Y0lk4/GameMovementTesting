@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     public float airJumpForce = 3.0f;
     public int airJumps = 1;
     public int airJumpCount = 0;
+    public float airSpeed;
 
 
 
@@ -50,7 +51,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("States")]
     private PlayerState currentState;
-    public PlayerState visibleState;
     public GroundedState GroundedState {get; private set;}
     public AirborneState AirborneState {get; private set;}
     public WalkState WalkState { get; private set;}
@@ -77,7 +77,6 @@ public class PlayerController : MonoBehaviour
 }
     void Start()
     {
-        visibleState = currentState;
         moveSpeed = defaultMoveSpeed;
         sprintSpeed = moveSpeed * 2f;
         crouchSpeed = defaultMoveSpeed / 2f;
@@ -97,7 +96,6 @@ public class PlayerController : MonoBehaviour
 
         currentState?.UpdateState(); 
         Inputs();
-        visibleState = currentState;
     }
 
     void FixedUpdate()
@@ -107,8 +105,20 @@ public class PlayerController : MonoBehaviour
 
     public void SwitchState(PlayerState newState)
     {
+        currentState?.Exit();
         currentState = newState;
         currentState.Enter();
+
+        if(currentState == AirborneState)
+        {   
+            Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+            airSpeed = Mathf.Max(flatVelocity.magnitude, moveSpeed);
+        }   
+
+        if (currentState == WalkState || currentState == SprintState || currentState == GroundedState)
+        {
+            airJumpCount = 0;
+        }
     }
 
 
@@ -123,11 +133,18 @@ public class PlayerController : MonoBehaviour
     {
         if(currentState is AirborneState)
         {
-            return;
-        }
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+            moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * 0.3f, ForceMode.Force);
+        }
+        else
+        {
+            rb.linearDamping = groundDrag;
+            moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        }
+        
     }
 
     public void Jump()
@@ -164,11 +181,24 @@ public class PlayerController : MonoBehaviour
     public void LimitSpeed()
     {
 
+
+
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
-        if (flatVelocity.magnitude > moveSpeed)
+
+        float maxSpeed = moveSpeed;
+        if(currentState == SprintState)
         {
-            Vector3 limitVelocity = flatVelocity.normalized * moveSpeed;
+            maxSpeed = sprintSpeed;
+        }
+        else if(currentState == AirborneState)
+        {
+            maxSpeed = airSpeed;
+        }
+
+        if (flatVelocity.magnitude > maxSpeed)
+        {
+            Vector3 limitVelocity = flatVelocity.normalized * maxSpeed;
             rb.linearVelocity = new Vector3(limitVelocity.x, rb.linearVelocity.y, limitVelocity.z);
         }
     }

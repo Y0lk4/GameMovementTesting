@@ -37,9 +37,7 @@ public class WallRunningState : AirborneState
 
     [Header("References")]
     public Transform orientation;
-    private PlayerController pm;
     private Rigidbody rb;
-    private Camera cam;
 
 
     public override void Enter()
