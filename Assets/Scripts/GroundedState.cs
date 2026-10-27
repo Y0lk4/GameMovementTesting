@@ -11,6 +11,7 @@ public abstract class GroundedState : PlayerState
     public override void Enter()
     {   
         base.Enter();
+        player.isGrounded = true;
         jumpTriggered = false;
     }
 

@@ -59,7 +59,6 @@ public class PlayerController : MonoBehaviour
     public ClimbingState ClimbingState { get; private set;}
     public CrouchingState CrouchingState { get; private set;}
     public BulletJumpingState BulletJumpingState { get; private set;}
-    public JumpState JumpState {get; private set;}
 
     void Start()
     {
@@ -79,27 +78,7 @@ public class PlayerController : MonoBehaviour
         //* Ground Check using a Raycast downwards
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
 
-        //* Grounded or Airborne section and not wall running + drag
-        if (isGrounded && !wallrunning && !isSliding)
-        {
-            airJumpCount = 0;
-            rb.linearDamping = groundDrag;
-            envState = EnvironmentState.Grounded;
-        }
-        else if (!isGrounded && !wallrunning)
-        {
-            rb.linearDamping = 0f;
-            envState = EnvironmentState.Airborne;
-        }
-
         Inputs();
-        StateHandler();
-
-        // Capture jump input in Update so frames aren't missed
-        if (Input.GetButtonDown("Jump"))
-        {
-            jumpRequested = true;
-        }
 
     }
 
