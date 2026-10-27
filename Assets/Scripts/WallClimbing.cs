@@ -1,16 +1,33 @@
 using UnityEngine;
+using UnityEngine.Rendering.RenderGraphModule;
 
-public class WallClimbing : MonoBehaviour
+public class ClimbingState : PlayerState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    private Rigidbody rb;
+    public ClimbingState(PlayerController player) : base(player)
     {
-        
+        rb = player.GetComponent<Rigidbody>();
+    }
+    public override void Enter()
+    {
+        base.Enter();
+        rb.isKinematic = true;
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void UpdateState()
     {
-        
+        base.UpdateState();
+    }
+
+    public override void FixedUpdateState()
+    {
+        base.FixedUpdateState();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        rb.isKinematic = false;
     }
 }

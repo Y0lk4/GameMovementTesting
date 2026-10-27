@@ -32,6 +32,9 @@ public class SlideState : GroundedState
     {
         base.UpdateState();
 
+        horizontalInput = player.horizontalInput;
+        verticalInput = player.verticalInput;
+
         if(Input.GetKeyUp(slideKey))
         {
             player.SwitchState(player.WalkState);
@@ -49,38 +52,6 @@ public class SlideState : GroundedState
     {
         base.Exit();
     }
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-        pc = GetComponent<PlayerController>();
-
-        
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
-
-        if(Input.GetKeyDown(slideKey) && (horizontalInput != 0 || verticalInput != 0) && pc.isSprinting && pc.isGrounded && !pc.isSliding)
-        {
-            StartSlide();
-        }
-
-        if(Input.GetKeyUp(slideKey) && pc.isSliding)
-        {
-            StopSlide();
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (pc.isSliding)
-        {
-            Slide();
-        }
-    }
 
     // handle the start of the slide where u get an extra force at the start of the slide for a speed boost
     private void StartSlide()
@@ -93,6 +64,7 @@ public class SlideState : GroundedState
         Vector3 slideDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
         //adds a small boost towards the direction i start sliding
         rb.AddForce(slideDirection * slideForce, ForceMode.Impulse);
+        Slide();
     }
 
     private void Slide()
@@ -101,13 +73,7 @@ public class SlideState : GroundedState
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
         rb.AddForce(-flatVelocity.normalized * slidingDecel, ForceMode.Force);
-        // irl time based deceleration
-        // Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
-
-        // flatVelocity = Vector3.MoveTowards(flatVelocity, Vector3.zero, slidingDecel * Time.fixedDeltaTime);
-
-        // rb.linearVelocity = new Vector3(flatVelocity.x, rb.linearVelocity.y, flatVelocity.z);
-
+       
         if(flatVelocity.magnitude < 0.2f)
         {
             StopSlide();
