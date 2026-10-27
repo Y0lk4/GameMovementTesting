@@ -24,6 +24,12 @@ public class CrouchingState : GroundedState
         }
     }
 
+    public override void FixedUpdateState()
+    {
+        base.FixedUpdateState();
+        
+    }
+
     public override void Exit()
     {
         base.Exit();

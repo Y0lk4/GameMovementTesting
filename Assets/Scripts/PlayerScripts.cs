@@ -1,5 +1,6 @@
 
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using NUnit;
 using NUnit.Framework;
@@ -49,7 +50,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("States")]
     private PlayerState currentState;
-    public GroundedState GroundedState {get: private set;}
+    public GroundedState GroundedState {get; private set;}
     public AirborneState AirborneState {get; private set;}
     public WalkState WalkState { get; private set;}
     public SprintState SprintState { get; private set;}
@@ -104,75 +105,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (wallrunning || isGrounded)
-        {
-            airJumpCount = 0;
-        }
-        if (jumpRequested)
-        {
-            if (isGrounded)
-            {
-                Jump();
-            }
-            else if (!isGrounded && !wallrunning && airJumpCount != airJumps)
-            {
-                AirJump();
-            }
-
-        }
-        if (isSliding)
-        {
-            transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
-            // see sliding script for sliding logic
-        }
-        else if (isCrouching)
-        {
-            isSprinting = false; // to make sure i am not sprinting during the sprint even thought its impossible
-                                 // its just to make sure sprint boolean is false after a slide
-            transform.localScale = new Vector3(transform.localScale.x, 0.7f, transform.localScale.z);
-
-            MovePlayer();
-        }
-        else
-        {
-            transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
-            MovePlayer();
-        }
-
-
-        LimitSpeed();
-    }
-
-    private void StateHandler()
-    {
-        if (wallrunning)
-        {
-            moveState = MovementState.WallRunning;
-            moveSpeed = wallrunSpeed;
-        }
-        else if (Input.GetKey(KeyCode.LeftControl) && isSliding)
-        {
-            moveState = MovementState.Sliding;
-        }
-        else if (Input.GetKey(KeyCode.LeftControl))
-        {
-            Crouching();
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftControl))
-        {
-            StartCrouching();
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftControl))
-        {
-            transform.localScale = new Vector3(transform.localScale.x, 1.0f, transform.localScale.z);
-            isCrouching = false;
-        }
-        else
-        {
-            moveSpeed = defaultMoveSpeed;
-            moveState = MovementState.Walking;
-            defaultBoolean();
-        }
+        
     }
 
     public void SwitchState(PlayerState newState)
@@ -220,8 +153,17 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
         }
     }
+
+    void OnCollisionEnter(Collision other)
+    {
+        if(other.gameObject.layer == 6 && currentState == AirborneState)
+        {
+            SwitchState(WallRunningState);
+        }
+    }
+
     //in case the walk speed goes faster than intended
-    private void LimitSpeed()
+    public void LimitSpeed()
     {
 
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
@@ -231,6 +173,16 @@ public class PlayerController : MonoBehaviour
             Vector3 limitVelocity = flatVelocity.normalized * moveSpeed;
             rb.linearVelocity = new Vector3(limitVelocity.x, rb.linearVelocity.y, limitVelocity.z);
         }
+    }
+
+    public void EnableGravity()
+    {
+        rb.useGravity = true;
+    }
+
+    public void DisableGravity()
+    {
+        rb.useGravity = false;
     }
 
 

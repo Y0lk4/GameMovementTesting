@@ -1,12 +1,16 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class SlidingScript : MonoBehaviour
+public class SlideState : GroundedState
 {
+    public SlideState(PlayerController player) : base(player)
+    {
+        rb = player.GetComponent<Rigidbody>();
+    }
 
     [Header("References")]
     public Transform orientation;
     public Transform playerObj;
-    private PlayerController pc;
     private Rigidbody rb;
 
     [Header("Sliding")]
@@ -18,6 +22,33 @@ public class SlidingScript : MonoBehaviour
     private float verticalInput;
     public KeyCode slideKey = KeyCode.LeftControl;
 
+
+    public override void Enter()
+    {
+        base.Enter();
+    }
+
+    public override void UpdateState()
+    {
+        base.UpdateState();
+
+        if(Input.GetKeyUp(slideKey))
+        {
+            player.SwitchState(player.WalkState);
+        }
+    }
+
+    public override void FixedUpdateState()
+    {
+        base.FixedUpdateState();
+
+        StartSlide();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -54,7 +85,6 @@ public class SlidingScript : MonoBehaviour
     // handle the start of the slide where u get an extra force at the start of the slide for a speed boost
     private void StartSlide()
     {
-        pc.isSliding = true;
         //to make sure when the player gets scaled down, the player does not float a bit
         rb.AddForce(Vector3.down * 10f, ForceMode.Impulse); 
 
@@ -80,15 +110,12 @@ public class SlidingScript : MonoBehaviour
 
         if(flatVelocity.magnitude < 0.2f)
         {
-            pc.isSliding = false;
-            pc.isSprinting = false;
-            pc.isCrouching = true;
             StopSlide();
         }
     }
 
     private void StopSlide()
     {
-        pc.isSliding = false;
+        player.SwitchState(player.CrouchingState);
     }
 }

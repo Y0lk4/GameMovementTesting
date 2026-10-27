@@ -10,6 +10,7 @@ public class WalkState : GroundedState
     {
         base.Enter();
         player.moveSpeed = player.defaultMoveSpeed;
+        
     }
 
     public override void UpdateState()
@@ -34,7 +35,8 @@ public class WalkState : GroundedState
     public override void FixedUpdateState()
     {
         base.FixedUpdateState();
-        
+        player.MovePlayer();
+        player.LimitSpeed();
     }
 
 }

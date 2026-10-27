@@ -9,7 +9,7 @@ public abstract class GroundedState : PlayerState
     public GroundedState(PlayerController player) : base(player) {}
 
     public override void Enter()
-    {
+    {   
         base.Enter();
         jumpTriggered = false;
     }
@@ -35,5 +35,6 @@ public abstract class GroundedState : PlayerState
             player.SwitchState(player.AirborneState);
         }
         player.MovePlayer();
+        player.LimitSpeed();
     }
 }
