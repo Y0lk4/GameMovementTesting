@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("States")]
     private PlayerState currentState;
+    public PlayerState visibleState;
     public GroundedState GroundedState {get; private set;}
     public AirborneState AirborneState {get; private set;}
     public WalkState WalkState { get; private set;}
@@ -60,13 +61,29 @@ public class PlayerController : MonoBehaviour
     public CrouchingState CrouchingState { get; private set;}
     public BulletJumpingState BulletJumpingState { get; private set;}
 
+
+    private void Awake()
+{
+    // 1. ALWAYS initialize the states first!
+    GroundedState = new GroundedState(this);
+    AirborneState = new AirborneState(this);
+    WalkState = new WalkState(this);
+    SprintState = new SprintState(this);
+    WallRunningState = new WallRunningState(this);
+    SlideState = new SlideState(this);
+    ClimbingState = new ClimbingState(this);
+    CrouchingState = new CrouchingState(this);
+    BulletJumpingState = new BulletJumpingState(this);
+}
     void Start()
     {
+        visibleState = currentState;
         moveSpeed = defaultMoveSpeed;
         sprintSpeed = moveSpeed * 2f;
         crouchSpeed = defaultMoveSpeed / 2f;
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // don't let collisions tip the player over
+        SwitchState(WalkState); 
     }
 
     void Update()
@@ -78,13 +95,14 @@ public class PlayerController : MonoBehaviour
         //* Ground Check using a Raycast downwards
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, groundMask);
 
+        currentState?.UpdateState(); 
         Inputs();
-
+        visibleState = currentState;
     }
 
     void FixedUpdate()
     {
-        
+        currentState?.FixedUpdateState();   
     }
 
     public void SwitchState(PlayerState newState)
@@ -129,6 +147,7 @@ public class PlayerController : MonoBehaviour
     {
         if (isGrounded)
         {
+            SwitchState(WalkState);
             rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
         }
     }

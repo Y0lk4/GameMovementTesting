@@ -22,6 +22,10 @@ public class AirborneState : PlayerState
         {
             player.AirJump();
         }
+        if(player.isGrounded)
+        {
+            player.SwitchState(player.WalkState);
+        }
     }
 
     public override void FixedUpdateState()
@@ -30,6 +34,11 @@ public class AirborneState : PlayerState
 
         Vector3 customGravity = new Vector3(0f, -12, 0f);
         rb.AddForce(customGravity, ForceMode.Acceleration);
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
     }
 
     
