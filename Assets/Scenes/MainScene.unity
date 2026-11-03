@@ -2570,10 +2570,7 @@ GameObject:
   - component: {fileID: 388604780}
   - component: {fileID: 388604779}
   - component: {fileID: 388604781}
-  - component: {fileID: 388604782}
-  - component: {fileID: 388604783}
   - component: {fileID: 388604784}
-  - component: {fileID: 388604785}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -2662,71 +2659,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   defaultMoveSpeed: 10
+  moveSpeed: 0
+  sprintSpeed: 0
+  crouchSpeed: 0
   jumpForce: 7
   dashForce: 50
   wallrunSpeed: 10
   airJumpForce: 2
   airJumps: 1
   airJumpCount: 0
+  airSpeed: 0
   orientation: {fileID: 1507472399}
   groundDrag: 5
+  horizontalInput: 0
+  verticalInput: 0
   playerHeight: 2
   groundMask:
     serializedVersion: 2
     m_Bits: 128
   groundCheckDistance: 0.2
   isGrounded: 0
-  isSliding: 0
-  isSprinting: 0
-  wallrunning: 0
-  isCrouching: 0
-  isBulletJumping: 0
   playerObject: {fileID: 388604776}
   mouseSensitivity: 2
-  moveState: 0
-  envState: 0
---- !u!114 &388604782
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 388604776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf6e6fdb087d4484793357d8033cd3ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WallRunning
-  whatIsWall:
-    serializedVersion: 2
-    m_Bits: 64
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 128
-  wallRunForce: 20
-  wallJumpForce: 7
-  wallJumpSideForce: 12
-  maxWallRunTime: 1.5
-  jumpKey: 32
-  wallCheckDistance: 0.7
-  minJumpHeight: 2
-  orientation: {fileID: 388604777}
---- !u!114 &388604783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 388604776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2d19fbf6be2b4744dae4816a64191b8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SlidingScript
-  orientation: {fileID: 1507472399}
-  playerObj: {fileID: 388604777}
-  slideForce: 20
-  slideKey: 306
 --- !u!114 &388604784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2740,20 +2694,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpeedMeter
   speedText: {fileID: 80219353}
---- !u!114 &388604785
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 388604776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b54f7feb969fd3d4b8cf1818946ea434, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BulletJumping
-  bulletJumpForce: 14
-  head: {fileID: 741174926}
 --- !u!1 &437241492
 GameObject:
   m_ObjectHideFlags: 0

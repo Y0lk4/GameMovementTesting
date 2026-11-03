@@ -164,7 +164,6 @@ public class PlayerController : MonoBehaviour
     {
         if (isGrounded)
         {
-            SwitchState(WalkState);
             rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
         }
     }
@@ -180,9 +179,6 @@ public class PlayerController : MonoBehaviour
     //in case the walk speed goes faster than intended
     public void LimitSpeed()
     {
-
-
-
         Vector3 flatVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
 
 

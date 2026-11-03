@@ -11,7 +11,6 @@ public class CrouchingState : GroundedState
         base.Enter();
         player.transform.localScale = new Vector3(player.transform.localScale.x, 0.7f, player.transform.localScale.z);
         player.moveSpeed = player.crouchSpeed;
-        player.StartCrouching();
     }
 
     public override void UpdateState()

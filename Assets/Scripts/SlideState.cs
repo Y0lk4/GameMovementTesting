@@ -1,4 +1,5 @@
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class SlideState : GroundedState
@@ -6,10 +7,10 @@ public class SlideState : GroundedState
     public SlideState(PlayerController player) : base(player)
     {
         rb = player.GetComponent<Rigidbody>();
+        
     }
 
     [Header("References")]
-    public Transform orientation;
     public Transform playerObj;
     private Rigidbody rb;
 
@@ -22,10 +23,15 @@ public class SlideState : GroundedState
     private float verticalInput;
     public KeyCode slideKey = KeyCode.LeftControl;
 
+    private bool isSliding;
+
 
     public override void Enter()
     {
         base.Enter();
+        player.transform.localScale = new Vector3(player.transform.localScale.x, 0.5f, player.transform.localScale.z);
+        rb = player.GetComponent<Rigidbody>();
+        isSliding = false;
     }
 
     public override void UpdateState()
@@ -43,9 +49,16 @@ public class SlideState : GroundedState
 
     public override void FixedUpdateState()
     {
-        base.FixedUpdateState();
 
-        StartSlide();
+        if(!isSliding)
+        {
+            StartSlide();
+        }
+        if(isSliding)
+        {
+            Slide();
+        }
+        
     }
 
     public override void Exit()
@@ -53,18 +66,17 @@ public class SlideState : GroundedState
         base.Exit();
     }
 
-    // handle the start of the slide where u get an extra force at the start of the slide for a speed boost
     private void StartSlide()
     {
-        //to make sure when the player gets scaled down, the player does not float a bit
+        
         rb.AddForce(Vector3.down * 10f, ForceMode.Impulse); 
 
         rb.linearDamping = 0f;
 
-        Vector3 slideDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+        Vector3 slideDirection = player.orientation.forward * verticalInput + player.orientation.right * horizontalInput;
         //adds a small boost towards the direction i start sliding
         rb.AddForce(slideDirection * slideForce, ForceMode.Impulse);
-        Slide();
+        isSliding = true;
     }
 
     private void Slide()
