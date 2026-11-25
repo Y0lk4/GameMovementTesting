@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class SlideState : GroundedState
 {
-    public SlideState(PlayerController player) : base(player)
-    {
-        rb = player.GetComponent<Rigidbody>();
-        
-    }
-
+    
     [Header("References")]
     public Transform playerObj;
     private Rigidbody rb;
@@ -25,12 +20,18 @@ public class SlideState : GroundedState
 
     private bool isSliding;
 
+    public SlideState(PlayerController player) : base(player)
+    {
+        rb = player.GetComponent<Rigidbody>();
+        
+    }
 
     public override void Enter()
     {
         base.Enter();
         player.transform.localScale = new Vector3(player.transform.localScale.x, 0.5f, player.transform.localScale.z);
-        rb = player.GetComponent<Rigidbody>();
+        Vector3 pushDown = new Vector3(0f, -5f, 0f);
+        rb.AddForce(pushDown, ForceMode.Impulse);
         isSliding = false;
     }
 
@@ -64,6 +65,7 @@ public class SlideState : GroundedState
     public override void Exit()
     {
         base.Exit();
+        isSliding = false;
     }
 
     private void StartSlide()

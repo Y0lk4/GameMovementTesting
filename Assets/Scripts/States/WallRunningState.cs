@@ -3,14 +3,8 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class WallRunningState : AirborneState
+public class WallRunningState : PlayerState
 {
-
-    public WallRunningState(PlayerController player) : base(player)
-    {
-        rb = player.GetComponent<Rigidbody>();
-    }
-
     [Header("Wallrunning")]
     public LayerMask whatIsWall;
     public LayerMask whatIsGround;
@@ -39,6 +33,11 @@ public class WallRunningState : AirborneState
     public Transform orientation;
     private Rigidbody rb;
 
+
+    public WallRunningState(PlayerController player) : base(player)
+    {
+        rb = player.GetComponent<Rigidbody>();
+    }
 
     public override void Enter()
     {
