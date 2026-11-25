@@ -5,32 +5,17 @@ using UnityEngine.AI;
 
 public class WallRunningState : PlayerState
 {
-    [Header("Wallrunning")]
-    public LayerMask whatIsWall;
-    public LayerMask whatIsGround;
-    public float wallRunForce;
-    public float wallJumpForce;
-    public float wallJumpSideForce;
-    public float maxWallRunTime;
+    // Wallrunning settings live on PlayerController (player.wallRunForce, etc.)
+    // so they can be tweaked in the Inspector.
     // private float wallRunTimer;
-    
-    
-    [Header("Input")]
-    // private float horizontalInput;
-    // private float verticalInput;
-    public KeyCode jumpKey = KeyCode.Space;
 
-    [Header("Detection")]
-    public float wallCheckDistance;
-    public float minJumpHeight;
     private RaycastHit leftWallhit;
     private RaycastHit rightWallhit;
     private bool wallLeft;
     private bool wallRight;
     private bool startWallJump = false;
 
-    [Header("References")]
-    public Transform orientation;
+    private Transform orientation => player.orientation;
     private Rigidbody rb;
 
 
@@ -79,8 +64,8 @@ public class WallRunningState : PlayerState
 
     private void CheckWalls()
     {                                             
-        wallRight = Physics.Raycast(player.transform.position, orientation.right, out rightWallhit, wallCheckDistance, whatIsWall);
-        wallLeft = Physics.Raycast(player.transform.position, -orientation.right, out leftWallhit, wallCheckDistance, whatIsWall);
+        wallRight = Physics.Raycast(player.transform.position, orientation.right, out rightWallhit, player.wallCheckDistance, player.whatIsWall);
+        wallLeft = Physics.Raycast(player.transform.position, -orientation.right, out leftWallhit, player.wallCheckDistance, player.whatIsWall);
     }
 
     private void WallRunningMovement()
@@ -100,7 +85,7 @@ public class WallRunningState : PlayerState
 
         //TBA, lock the camera to the direction im wall running to
         orientation.rotation = Quaternion.Slerp(orientation.rotation, Quaternion.LookRotation(wallForward), Time.deltaTime * 5f);
-        rb.AddForce(wallForward * wallRunForce, ForceMode.Force);
+        rb.AddForce(wallForward * player.wallRunForce, ForceMode.Force);
     }
     
     private void WallJump()
@@ -109,7 +94,7 @@ public class WallRunningState : PlayerState
         Vector3 wallNormal = wallRight ? rightWallhit.normal : leftWallhit.normal;
 
         // multiply the up with the force of the jump that goes up and add the force thats going outwards the wall which is multiplied by the wall normal
-        Vector3 forceToApply = player.transform.up * wallJumpForce + wallNormal * wallJumpSideForce;
+        Vector3 forceToApply = player.transform.up * player.wallJumpForce + wallNormal * player.wallJumpSideForce;
 
         // rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
         rb.AddForce(forceToApply, ForceMode.VelocityChange);

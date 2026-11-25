@@ -25,6 +25,11 @@ public class GroundedState : PlayerState
         {
             jumpTriggered = true;
         }
+        if (!player.isGrounded)
+        {
+            player.SwitchState(player.AirborneState);
+            return;
+        }
     }
 
     public override void FixedUpdateState()

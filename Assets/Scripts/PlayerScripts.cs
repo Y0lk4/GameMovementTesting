@@ -12,8 +12,6 @@ using UnityEngine.Assertions.Must;
 using UnityEngine.InputSystem.DualShock.LowLevel;
 using UnityEngine.InputSystem.XR.Haptics;
 using UnityEngine.Rendering.Universal;
-using 
-
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
@@ -42,6 +40,15 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundMask;
     public float groundCheckDistance = 0.2f;
     public bool isGrounded = true;
+
+    [Header("Wallrunning")]
+    public LayerMask whatIsWall = 1 << 6; // layer 6, same one OnCollisionEnter checks
+    public float wallRunForce = 200f;
+    public float wallJumpForce = 7f;
+    public float wallJumpSideForce = 12f;
+    public float maxWallRunTime = 0.7f;
+    public float wallCheckDistance = 0.7f;
+    public float minJumpHeight = 2f;
 
     Rigidbody rb;
     [SerializeField] private GameObject playerObject;
