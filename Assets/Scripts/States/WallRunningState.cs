@@ -28,6 +28,7 @@ public class WallRunningState : PlayerState
     {
         base.Enter();
         player.DisableGravity();
+        CheckWalls();
     }
 
     public override void UpdateState()
@@ -37,6 +38,11 @@ public class WallRunningState : PlayerState
         if(Input.GetKeyDown(KeyCode.Space))
         {
             startWallJump = true;
+        }
+        if(player.isGrounded)
+        {
+            player.SwitchState(player.WalkState);
+            return;
         }
         if(!wallLeft && !wallRight)
         {
@@ -48,12 +54,13 @@ public class WallRunningState : PlayerState
     {
         base.FixedUpdateState();
 
-        WallRunningMovement();
-
         if(startWallJump)
         {
             WallJump();
+            return;
         }
+
+        WallRunningMovement();
     }
 
     public override void Exit()
@@ -100,6 +107,8 @@ public class WallRunningState : PlayerState
         rb.AddForce(forceToApply, ForceMode.VelocityChange);
         player.airJumpCount = 0; //ensure that we can double jump after a wall jump
         startWallJump = false;
+
+        player.SwitchState(player.AirborneState);
  
     }
 }
